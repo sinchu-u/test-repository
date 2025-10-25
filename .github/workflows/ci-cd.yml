@@ -39,4 +39,24 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: report.html  
+          path: report.html
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [test]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build project
+        run: |
+          mkdir build
+          echo "This is a build artifact" > build/output.txt
+          echo "Build completed successfully."
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: build/
