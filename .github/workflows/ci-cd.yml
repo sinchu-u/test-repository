@@ -52,11 +52,35 @@ jobs:
       - name: Build project
         run: |
           mkdir build
-          echo "This is a build artifact" > build/output.txt
-          echo "Build completed successfully."
+          echo "Build artifact created at $(date)" > build/build-info.txt
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-artifact
           path: build/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: staging
+      url: https://example.com/staging
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: build/
+
+      - name: Deploy to staging
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          echo "Starting deploy to staging..."
+          echo "Using DEPLOY_TOKEN (hidden in logs)"
+          echo "Deployed build files:"
+          ls -R build/
+          echo "Deploy completed successfully at $(date)"
